@@ -5,9 +5,6 @@ on:
     types: [opened]
 
 # least privilege: the bot can only write issues (labels and comments)
-concurrency:
-  group: maintainerbot-queue
-  cancel-in-progress: false
 permissions:
   issues: write
 

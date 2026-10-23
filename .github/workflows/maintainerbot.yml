@@ -5,6 +5,9 @@ on:
     types: [opened]
 
 # least privilege: the bot can only write issues (labels and comments)
+concurrency:
+  group: maintainerbot-queue
+  cancel-in-progress: false
 permissions:
   issues: write
 
@@ -31,15 +34,11 @@ jobs:
         run: python bot/main.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MB_LIVE: "true"                  # post the label and comment for real
+          MB_LIVE: ${{ vars.MAINTAINERBOT_LIVE || 'false' }}   # dry-run unless the repo variable is "true"
           MB_CLS_THRESHOLD: "0.8"
-          MB_DOC_THRESHOLD: "0.70"
+          MB_DOC_THRESHOLD: "0.7"        # adjust after try_retrieval
           MB_DOCS_PATH: README.md
-          MB_GEMMA: "off"                  # no Ollama on the runner: templated reply
-
-      - name: Show audit log
-        if: always()
-        run: cat audit/audit.jsonl
+          MB_GEMMA: "off"                # no Ollama on the runner: templated reply
 
       - name: Upload audit log
         if: always()
